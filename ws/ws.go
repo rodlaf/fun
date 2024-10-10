@@ -10,6 +10,7 @@ import (
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
+		// Allow all connections by default
 		return true
 	},
 }
@@ -40,7 +41,13 @@ func main() {
 
 func handleGetState(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{ \"state\": " + arrayToString(state) + " }"))
+	stateJSON := "{ \"state\": " + arrayToString(state) + " }"
+	_, err := w.Write([]byte(stateJSON))
+	if err != nil {
+		log.Printf("Error writing state response: %v", err)
+	} else {
+		log.Printf("State response sent: %s", stateJSON)
+	}
 }
 
 func arrayToString(arr []int) string {
@@ -58,19 +65,26 @@ func arrayToString(arr []int) string {
 func handleConnections(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error upgrading to websocket: %v", err)
+		return
 	}
-	defer ws.Close()
+	defer func() {
+		ws.Close()
+		log.Println("WebSocket connection closed")
+	}()
 
 	clients[ws] = true
+	log.Println("New WebSocket connection established")
 
 	for {
 		var stateUpdate StateUpdate
 		err := ws.ReadJSON(&stateUpdate)
 		if err != nil {
+			log.Printf("Error reading JSON from websocket: %v", err)
 			delete(clients, ws)
 			break
 		}
+		log.Printf("Received state update: %+v", stateUpdate)
 		broadcast <- stateUpdate
 	}
 }
@@ -78,14 +92,18 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 func handleStateUpdates() {
 	for {
 		stateUpdate := <-broadcast
+		log.Printf("Broadcasting state update: %+v", stateUpdate)
 
 		state[stateUpdate.Index] = stateUpdate.Value
 
 		for client := range clients {
 			err := client.WriteJSON(stateUpdate)
 			if err != nil {
+				log.Printf("Error writing JSON to websocket: %v", err)
 				client.Close()
 				delete(clients, client)
+			} else {
+				log.Printf("State update sent to client: %+v", stateUpdate)
 			}
 		}
 	}

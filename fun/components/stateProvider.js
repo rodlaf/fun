@@ -9,7 +9,7 @@ const StateProvider = ({ children, initialValue = new Array(10).fill(null) }) =>
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080/ws');
+    const socket = new WebSocket('wss://colorfun.fly.dev:7001/ws');
     setWs(socket);
 
     socket.onmessage = (event) => {

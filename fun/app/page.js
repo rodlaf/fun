@@ -2,7 +2,7 @@ import { StateProvider } from "@/components/stateProvider";
 import Rotator from "@/components/rotator";
 
 export default async function Home() {
-    const res = await fetch("http://localhost:8080/getState", { cache: 'no-store' })
+    const res = await fetch("http://0.0.0.0:8080/getState", { cache: 'no-store' })
     const data = await res.json()
     const state = data.state
 

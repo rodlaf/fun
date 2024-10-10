@@ -1,0 +1,38 @@
+# flyctl launch added from fun/.gitignore
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+fun/node_modules
+fun/.pnp
+fun/**/.pnp.js
+fun/**/.yarn/install-state.gz
+
+# testing
+fun/coverage
+
+# next.js
+fun/.next
+fun/out
+
+# production
+fun/build
+
+# misc
+fun/**/.DS_Store
+fun/**/*.pem
+
+# debug
+fun/**/npm-debug.log*
+fun/**/yarn-debug.log*
+fun/**/yarn-error.log*
+
+# local env files
+fun/**/.env*.local
+
+# vercel
+fun/**/.vercel
+
+# typescript
+fun/**/*.tsbuildinfo
+fun/**/next-env.d.ts
+fly.toml

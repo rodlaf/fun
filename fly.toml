@@ -1,0 +1,39 @@
+# fly.toml app configuration file generated for colorfun on 2024-10-10T02:03:13-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'colorfun'
+primary_region = 'bos'
+
+[build]
+    dockerfile = './Dockerfile'
+
+[[services]]
+    protocol = 'tcp'
+    internal_port = 3000
+
+    [[services.ports]]
+        port = 80
+        handlers = ['http']
+
+    [[services.ports]]
+        port = 443
+        handlers = ['tls', 'http']
+
+[[services]]
+    protocol = 'tcp'
+    internal_port = 8080
+
+    [[services.ports]]
+        port = 7000
+        handlers = ['http']
+
+    [[services.ports]]
+        port = 7001
+        handlers = ['tls', 'http']
+
+[[vm]]
+    memory = '512mb'
+    cpu_kind = 'shared'
+    cpus = 1
